@@ -1,0 +1,7 @@
+import path from "path";
+import readFileCore from "./core/read.js";
+import createFileCore from "./core/create.js";
+
+readFileCore(path.resolve("./", "blabla.json"));
+
+createFileCore(path.resolve("./", "blabla.json"));
