@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import errrHandler from "../utils/errorHandler.js";
+import errrHandler from "../../utils/errorHandler.js";
 
 const createCore = async (createPath, type) => {
     try {

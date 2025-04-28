@@ -1,5 +1,5 @@
 import fs from "fs";
-import errrHandler from "../utils/errorHandler.js";
+import errrHandler from "../../utils/errorHandler.js";
 
 const readFileCore = async (pathToFile) => {
     try {

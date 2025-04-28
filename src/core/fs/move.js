@@ -1,4 +1,4 @@
-import errrHandler from "../utils/errorHandler.js";
+import errrHandler from "../../utils/errorHandler.js";
 import copyFileCore from "./copy.js";
 import removeFileCore from "./remove.js";
 

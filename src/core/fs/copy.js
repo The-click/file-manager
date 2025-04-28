@@ -1,7 +1,7 @@
 import { pipeline } from "node:stream/promises";
 import fs from "fs";
 import path from "path";
-import errrHandler from "../utils/errorHandler.js";
+import errrHandler from "../../utils/errorHandler.js";
 import isFileExist from "./isFileExist.js";
 
 const copyFileCore = async (oldFilePath, dirPath) => {
