@@ -7,7 +7,10 @@ import isFileExist from "./isFileExist.js";
 const copyFileCore = async (oldFilePath, dirPath) => {
     try {
         const readStream = fs.createReadStream(oldFilePath);
-        const newFilePath = path.resolve(dirPath, path.basename(oldFilePath));
+        const newFilePath = path.resolve(
+            dirPath,
+            path.win32.basename(oldFilePath)
+        );
         const writeStream = fs.createWriteStream(newFilePath);
 
         if (await isFileExist(newFilePath)) {
