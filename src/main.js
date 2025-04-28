@@ -6,6 +6,8 @@ import copyFileCore from "./core/fs/copy.js";
 import removeFileCore from "./core/fs/remove.js";
 import moveFileCore from "./core/fs/move.js";
 import funcModule from "./core/os/index.js";
+import calculateHash from "./core/hash/index.js";
+import compression from "./core/compress/index.js";
 
 // readFileCore(path.resolve("./", "blabla.js"));
 // await createCore(path.resolve("./", "blabla"), "dir");
@@ -24,12 +26,18 @@ import funcModule from "./core/os/index.js";
 // );
 
 // Получаем все экспортированные функции
-const allFunctions = Object.entries(funcModule);
+// const allFunctions = Object.entries(funcModule);
 
-// Запускаем каждую функцию
-allFunctions.forEach(([funcName, func]) => {
-    if (typeof func === "function") {
-        console.log(`Запуск функции: ${funcName}`);
-        console.log(func());
-    }
-});
+// // Запускаем каждую функцию
+// allFunctions.forEach(([funcName, func]) => {
+//     if (typeof func === "function") {
+//         console.log(`Запуск функции: ${funcName}`);
+//         console.log(func());
+//     }
+// });
+
+// await calculateHash(path.resolve("./", "blabla.txt"));
+
+// compression.compress(path.resolve("./", "blabla.txt"), path.resolve("./"));
+
+compression.decompress(path.resolve("./", "blabla.txt.gz"), path.resolve("./"));
