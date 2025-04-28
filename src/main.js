@@ -1,10 +1,11 @@
 import path from "path";
-import readFileCore from "./core/read.js";
-import createCore from "./core/create.js";
-import renameFileCore from "./core/rename.js";
-import copyFileCore from "./core/copy.js";
-import removeFileCore from "./core/remove.js";
-import moveFileCore from "./core/move.js";
+import readFileCore from "./core/fs/read.js";
+import createCore from "./core/fs/create.js";
+import renameFileCore from "./core/fs/rename.js";
+import copyFileCore from "./core/fs/copy.js";
+import removeFileCore from "./core/fs/remove.js";
+import moveFileCore from "./core/fs/move.js";
+import funcModule from "./core/os/index.js";
 
 // readFileCore(path.resolve("./", "blabla.js"));
 // await createCore(path.resolve("./", "blabla"), "dir");
@@ -21,3 +22,14 @@ import moveFileCore from "./core/move.js";
 //     path.resolve("./", "blabla.js"),
 //     path.resolve("./", "blabla")
 // );
+
+// Получаем все экспортированные функции
+const allFunctions = Object.entries(funcModule);
+
+// Запускаем каждую функцию
+allFunctions.forEach(([funcName, func]) => {
+    if (typeof func === "function") {
+        console.log(`Запуск функции: ${funcName}`);
+        console.log(func());
+    }
+});
