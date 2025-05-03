@@ -1,12 +1,29 @@
 import fs from "node:fs/promises";
-import errrHandler from "../../utils/errorHandler.js";
+import FsCommandBase from "./base.js";
 
-const removeFileCore = async (filePath) => {
-    try {
-        await fs.rm(filePath);
-    } catch (e) {
-        errrHandler(e);
+class RemoveCLICommand extends FsCommandBase {
+    #name = "rm";
+
+    get name() {
+        return this.#name;
     }
-};
 
-export default removeFileCore;
+    async execute(args) {
+        try {
+            const { pathToFile } = this.getArgs(args);
+
+            await fs.rm(pathToFile);
+        } catch (e) {
+            this.errorHandler(e);
+        }
+    }
+
+    getArgs(args) {
+        const [pathToFile] = this.validatePassedArgs(args, 1);
+        const [absPathToFile] = this.getAbsolutePath([pathToFile]);
+
+        return { pathToFile: absPathToFile };
+    }
+}
+
+export default RemoveCLICommand;

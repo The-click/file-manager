@@ -1,19 +1,37 @@
 import fs from "node:fs/promises";
-import errrHandler from "../../utils/errorHandler.js";
-import isFileExist from "./isFileExist.js";
+import path from "path";
+import FsCommandBase from "./base.js";
 
-const renameFileCore = async (oldFilePath, newFilePath) => {
-    try {
-        if (await isFileExist(newFilePath)) {
-            const error = new Error("File already exists");
-            error.code = "FEXIST";
-            throw error;
-        }
+class RenameCLICommand extends FsCommandBase {
+    #name = "rn";
 
-        await fs.rename(oldFilePath, newFilePath);
-    } catch (err) {
-        errrHandler(err);
+    get name() {
+        return this.#name;
     }
-};
 
-export default renameFileCore;
+    async execute(args) {
+        try {
+            const { oldFilePath, newFileName } = this.getArgs(args);
+            const newFilePath = path.resolve(oldFilePath, "..", newFileName);
+
+            if (await this.isFileExist(newFilePath)) {
+                const error = new Error("File already exists");
+                error.code = "FEXIST";
+                throw error;
+            }
+
+            await fs.rename(oldFilePath, newFilePath);
+        } catch (e) {
+            this.errorHandler(e);
+        }
+    }
+
+    getArgs(args) {
+        const [oldFilePath, newFileName] = this.validatePassedArgs(args, 2);
+        const [absOldFilePath] = this.getAbsolutePath([oldFilePath]);
+
+        return { oldFilePath: absOldFilePath, newFileName };
+    }
+}
+
+export default RenameCLICommand;

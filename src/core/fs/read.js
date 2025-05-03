@@ -1,18 +1,33 @@
 import fs from "fs";
-import errrHandler from "../../utils/errorHandler.js";
+import FsCommandBase from "./base.js";
 
-const readFileCore = async (pathToFile) => {
-    try {
-        const readStream = fs.createReadStream(pathToFile);
+class ReadCLICommand extends FsCommandBase {
+    #name = "read";
 
-        readStream.on("error", errrHandler);
-        readStream.on("data", (chunk) => {
-            process.stdout.write(chunk + "\n");
-        });
-        // readStream.on("end", () => console.log("end"));
-    } catch (e) {
-        errrHandler(e);
+    get name() {
+        return this.#name;
     }
-};
 
-export default readFileCore;
+    async execute(args) {
+        try {
+            const { pathToFile } = this.getArgs(args);
+            const readStream = fs.createReadStream(pathToFile);
+
+            readStream.on("error", this.errorHandler.bind(this));
+            readStream.on("data", (chunk) => {
+                process.stdout.write(chunk + "\n");
+            });
+        } catch (e) {
+            this.errorHandler(e);
+        }
+    }
+
+    getArgs(args) {
+        const [pathToFile] = this.validatePassedArgs(args, 1);
+        const [absPathToFile] = this.getAbsolutePath([pathToFile]);
+
+        return { pathToFile: absPathToFile };
+    }
+}
+
+export default ReadCLICommand;
