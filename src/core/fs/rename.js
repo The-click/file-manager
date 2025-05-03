@@ -11,26 +11,25 @@ class RenameCLICommand extends FsCommandBase {
 
     async execute(args) {
         try {
-            const { oldFilePath, newFileName } = this.getArgs(args);
-            const newFilePath = path.resolve(oldFilePath, "..", newFileName);
-
-            if (await this.isFileExist(newFilePath)) {
-                const error = new Error("File already exists");
-                error.code = "FEXIST";
-                throw error;
-            }
-
+            const { oldFilePath, newFilePath } = await this.getArgs(args);
             await fs.rename(oldFilePath, newFilePath);
         } catch (e) {
             this.errorHandler(e);
         }
     }
 
-    getArgs(args) {
+    async getArgs(args) {
         const [oldFilePath, newFileName] = this.validatePassedArgs(args, 2);
         const [absOldFilePath] = this.getAbsolutePath([oldFilePath]);
+        const newFilePath = path.resolve(oldFilePath, "..", newFileName);
 
-        return { oldFilePath: absOldFilePath, newFileName };
+        if (await this.isFileExist(newFilePath)) {
+            const error = new Error("File already exists");
+            error.code = "FEXIST";
+            throw error;
+        }
+
+        return { oldFilePath: absOldFilePath, newFilePath };
     }
 }
 

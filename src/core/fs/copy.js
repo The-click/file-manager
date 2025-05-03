@@ -12,27 +12,16 @@ class CopyCLICommand extends FsCommandBase {
 
     async execute(args) {
         try {
-            const { oldFilePath, dirPath } = this.getArgs(args);
+            const { oldFilePath, newFilePath } = await this.getArgs(args);
             const readStream = fs.createReadStream(oldFilePath);
-            const newFilePath = path.resolve(
-                dirPath,
-                path.win32.basename(oldFilePath)
-            );
             const writeStream = fs.createWriteStream(newFilePath);
-
-            if (await this.isFileExist(newFilePath)) {
-                const error = new Error("File already exists");
-                error.code = "FEXIST";
-                throw error;
-            }
-
             await pipeline(readStream, writeStream);
         } catch (e) {
             this.errorHandler(e);
         }
     }
 
-    getArgs(args) {
+    async getArgs(args) {
         const [oldFilePath, dirPath] = this.validatePassedArgs(args, 2);
 
         const [absOldFilePath, absDirPath] = this.getAbsolutePath([
@@ -40,7 +29,21 @@ class CopyCLICommand extends FsCommandBase {
             dirPath,
         ]);
 
-        return { oldFilePath: absOldFilePath, dirPath: absDirPath };
+        const newFilePath = path.resolve(
+            absDirPath,
+            path.win32.basename(oldFilePath)
+        );
+
+        if (
+            (await this.isFileExist(newFilePath)) ||
+            !(await this.isFileExist(oldFilePath))
+        ) {
+            const error = new Error("Invalid input");
+            error.code = "FEXIST";
+            throw error;
+        }
+
+        return { oldFilePath: absOldFilePath, newFilePath };
     }
 }
 
