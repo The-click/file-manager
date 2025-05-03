@@ -2,7 +2,7 @@ import fs from "fs";
 import FsCommandBase from "./base.js";
 
 class ReadCLICommand extends FsCommandBase {
-    #name = "read";
+    #name = "cat";
 
     get name() {
         return this.#name;
