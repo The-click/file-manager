@@ -1,23 +1,52 @@
-import os from "node:os";
+import os from "os";
+import CommandBase from "../cli-command/CommandBase.js";
+import colorText from "../../utils/colorText.js";
+class OsCommandBase extends CommandBase {
+    #name = "os";
 
-function getOperSysEOL() {
-    return os.EOL;
+    get name() {
+        return this.#name;
+    }
+
+    async execute(args) {
+        try {
+            const { method } = await this.getArgs(args);
+
+            let answer;
+
+            switch (method) {
+                case "--EOL":
+                    answer = JSON.stringify(os.EOL);
+                    break;
+                case "--cpus":
+                    answer = JSON.stringify(os.cpus(), null, 2);
+                    break;
+                case "--homedir":
+                    answer = os.homedir();
+                    break;
+                case "--username":
+                    answer = os.userInfo({ encoding: "utf8" }).username;
+                    break;
+                case "--architecture":
+                    answer = os.arch();
+                    break;
+                default:
+                    const error = new Error("Invalid input");
+                    error.code = "ARGNOT";
+                    throw error;
+            }
+
+            console.log(colorText(answer, "green"));
+        } catch (e) {
+            this.errorHandler(e);
+        }
+    }
+
+    async getArgs(args) {
+        const [method] = this.validatePassedArgs(args, 1);
+
+        return { method };
+    }
 }
 
-function getCPUS() {
-    return os.cpus();
-}
-
-function getHomeDir() {
-    return os.homedir();
-}
-
-function getArch() {
-    return os.arch();
-}
-
-function getUserInfo() {
-    return os.userInfo({ encoding: "utf8" }).username;
-}
-
-export default { getArch, getCPUS, getHomeDir, getOperSysEOL, getUserInfo };
+export default OsCommandBase;
