@@ -36,7 +36,7 @@ class OsCommandBase extends CommandBase {
                     throw error;
             }
 
-            console.log(colorText(answer, "green"));
+            this.printReuslt(answer);
         } catch (e) {
             this.errorHandler(e);
         }

@@ -1,10 +1,15 @@
 import path from "path";
+import colorText from "../../utils/colorText.js";
 
 class CommandBase {
     constructor() {}
 
     execute() {}
     getArgs() {}
+
+    printReuslt(text) {
+        console.log(colorText(text, "green"));
+    }
 
     async isFileExist(filePath) {
         try {
