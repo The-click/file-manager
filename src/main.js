@@ -30,7 +30,20 @@ class CLIApplication {
     }
 
     setUserName() {
-        this.userName = process.env.npm_config_username || "guest";
+        if (process.env.npm_config_username) {
+            this.userName = process.env.npm_config_username;
+            return;
+        }
+
+        const args = process.argv.slice(2); // Убирает "node" и путь к файлу
+
+        if (!args.length) {
+            this.userName = "guest";
+            return;
+        }
+
+        const [key, value] = args[0]?.split("=");
+        this.userName = key === "--username" ? value : "guest";
     }
 
     registerCommand(commandList) {
@@ -76,7 +89,7 @@ class CLIApplication {
         process.on("exit", () => {
             console.log(
                 colorText(
-                    `Thank you for using File Manager, ${this.userName}, goodbye!`,
+                    `\nThank you for using File Manager, ${this.userName}, goodbye!`,
                     "white"
                 )
             );
