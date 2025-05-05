@@ -35,7 +35,7 @@ class CLIApplication {
             return;
         }
 
-        const args = process.argv.slice(2); // Убирает "node" и путь к файлу
+        const args = process.argv.slice(2);
 
         if (!args.length) {
             this.userName = "guest";
