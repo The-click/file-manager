@@ -1,14 +1,21 @@
 import path from "path";
 import colorText from "../../utils/colorText.js";
-
+import fs from "fs/promises";
 class CommandBase {
     constructor() {}
 
     execute() {}
     getArgs() {}
 
-    printReuslt(text) {
-        console.log(colorText(text, "green"));
+    printResult(text, type = "log") {
+        if (type === "log") {
+            console.log(colorText(text, "green"));
+            return;
+        }
+
+        if (type === "table") {
+            console.table(text);
+        }
     }
 
     async isFileExist(filePath) {
@@ -48,30 +55,34 @@ class CommandBase {
         );
     }
 
-    showError(type) {
+    showError(type, message) {
         if (type === "input") {
-            process.stderr.write("Invalid input\n");
+            process.stderr.write(
+                `${colorText("Invalid input:", "red")} ${message}\n`
+            );
         }
         if (type === "operation") {
-            process.stderr.write("Operation failed\n");
+            process.stderr.write(
+                `${colorText("Operation failed:", "red")} ${message}\n`
+            );
         }
     }
 
     errorHandler(err) {
-        console.log(err);
-        if (
-            err.code === "ENOENT" ||
-            err.code === "EEXIST" ||
-            err.code === "FEXIST" ||
-            err.code === "EISDIR" ||
-            err.code === "ARGNOT" ||
-            err.code === "ERR_INVALID_ARG_TYPE"
-        ) {
-            this.showError("input");
+        const typeInvalidInput = [
+            "ENOENT",
+            "EEXIST",
+            "FEXIST",
+            "EISDIR",
+            "ARGNOT",
+            "ERR_INVALID_ARG_TYPE",
+        ];
+        if (typeInvalidInput.includes(err.code)) {
+            this.showError("input", err.message);
             return;
         }
 
-        this.showError("operation");
+        this.showError("operation", err.message);
     }
 }
 
