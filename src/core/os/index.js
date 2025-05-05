@@ -18,7 +18,21 @@ class OsCommandBase extends CommandBase {
                     answer = JSON.stringify(os.EOL);
                     break;
                 case "--cpus":
-                    answer = JSON.stringify(os.cpus(), null, 2);
+                    answer = "Amount cpus: " + os.cpus().length + "\n";
+                    answer += os
+                        .cpus()
+                        .map((cpu) =>
+                            JSON.stringify(
+                                {
+                                    Model: cpu.model.trim(),
+                                    "Clock rate": (cpu.speed / 1000).toFixed(2),
+                                },
+                                null,
+                                2
+                            )
+                        )
+                        .join("\n");
+
                     break;
                 case "--homedir":
                     answer = os.homedir();
