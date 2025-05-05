@@ -34,11 +34,14 @@ class MoveCLICommand extends FsCommandBase {
             path.win32.basename(oldFilePath)
         );
 
-        if (
-            (await this.isFileExist(newFilePath)) ||
-            !(await this.isFileExist(oldFilePath))
-        ) {
-            const error = new Error("Invalid input");
+        if (await this.isFileExist(newFilePath)) {
+            const error = new Error("No new path found " + absDirPath);
+            error.code = "FEXIST";
+            throw error;
+        }
+
+        if (!(await this.isFileExist(absOldFilePath))) {
+            const error = new Error("File not found " + absOldFilePath);
             error.code = "FEXIST";
             throw error;
         }

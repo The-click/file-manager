@@ -1,5 +1,6 @@
 import fs from "fs";
 import FsCommandBase from "./base.js";
+import colorText from "../../utils/colorText.js";
 
 class ReadCLICommand extends FsCommandBase {
     #name = "cat";
@@ -11,15 +12,23 @@ class ReadCLICommand extends FsCommandBase {
     async execute(args) {
         try {
             const { pathToFile } = this.getArgs(args);
-            const readStream = fs.createReadStream(pathToFile);
 
-            readStream.on("error", this.errorHandler.bind(this));
-            readStream.on("data", (chunk) => {
-                process.stdout.write(chunk + "\n");
-            });
+            await this.runStream(pathToFile);
         } catch (e) {
             this.errorHandler(e);
         }
+    }
+
+    runStream(pathToFile) {
+        return new Promise((resolve, reject) => {
+            const readStream = fs.createReadStream(pathToFile);
+
+            readStream.on("error", reject);
+            readStream.on("end", resolve);
+            readStream.on("data", (chunk) => {
+                process.stdout.write(colorText(chunk + "\n", "cyan", "bold"));
+            });
+        });
     }
 
     getArgs(args) {

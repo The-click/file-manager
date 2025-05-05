@@ -1,6 +1,5 @@
 import os from "os";
 import CommandBase from "../cli-command/CommandBase.js";
-import colorText from "../../utils/colorText.js";
 class OsCommandBase extends CommandBase {
     #name = "os";
 
@@ -31,12 +30,14 @@ class OsCommandBase extends CommandBase {
                     answer = os.arch();
                     break;
                 default:
-                    const error = new Error("Invalid input");
+                    const error = new Error(
+                        `The command ${method} was not found`
+                    );
                     error.code = "ARGNOT";
                     throw error;
             }
 
-            this.printReuslt(answer);
+            this.printResult(answer);
         } catch (e) {
             this.errorHandler(e);
         }

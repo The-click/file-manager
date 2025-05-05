@@ -13,7 +13,7 @@ class HashCLICommand extends CommandBase {
         try {
             const { pathToFile } = this.getArgs(args);
             const hashValue = await this.getHash(pathToFile);
-            this.printReuslt(hashValue);
+            this.printResult(hashValue);
         } catch (e) {
             this.errorHandler(e);
         }

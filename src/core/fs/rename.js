@@ -21,7 +21,7 @@ class RenameCLICommand extends FsCommandBase {
     async getArgs(args) {
         const [oldFilePath, newFileName] = this.validatePassedArgs(args, 2);
         const [absOldFilePath] = this.getAbsolutePath([oldFilePath]);
-        const newFilePath = path.resolve(oldFilePath, "..", newFileName);
+        const newFilePath = path.resolve(absOldFilePath, "..", newFileName);
 
         if (await this.isFileExist(newFilePath)) {
             const error = new Error("File already exists");
