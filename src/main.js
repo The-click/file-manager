@@ -1,43 +1,105 @@
 import path from "path";
-import readFileCore from "./core/fs/read.js";
-import createCore from "./core/fs/create.js";
-import renameFileCore from "./core/fs/rename.js";
-import copyFileCore from "./core/fs/copy.js";
-import removeFileCore from "./core/fs/remove.js";
-import moveFileCore from "./core/fs/move.js";
-import funcModule from "./core/os/index.js";
-import calculateHash from "./core/hash/index.js";
-import compression from "./core/compress/index.js";
+import CopyCLICommand from "./core/fs/copy.js";
+import FsCommandBase from "./core/fs/base.js";
+import os from "os";
+import { AddCLICommand, MkDirCLICommand } from "./core/fs/create.js";
+import ReadCLICommand from "./core/fs/read.js";
+import RemoveCLICommand from "./core/fs/remove.js";
+import RenameCliCommand from "./core/fs/rename.js";
+import MoveCLICommand from "./core/fs/move.js";
+import OsCommandBase from "./core/os/index.js";
+import HashCLICommand from "./core/hash/index.js";
+import {
+    CompressCLICommand,
+    DecompressCLICommand,
+} from "./core/compress/index.js";
+import {
+    ChangeDirCLICommand,
+    ListCLICommand,
+    UpCLICommand,
+} from "./core/navigation/index.js";
+import colorText from "./utils/colorText.js";
 
-// readFileCore(path.resolve("./", "blabla.js"));
-// await createCore(path.resolve("./", "blabla"), "dir");
-// await createCore(path.resolve("./", "blabla", "bla.js"), "file");
-// await renameFileCore(
-//     path.resolve("./", "blabla", "dd"),
-//     path.resolve("./", "qwaqwa")
-// );
-// await copyFileCore(
-//     path.resolve("./", "blabla.js"),
-//     path.resolve("./", "blabla")
-// );
-// await moveFileCore(
-//     path.resolve("./", "blabla.js"),
-//     path.resolve("./", "blabla")
-// );
+class CLIApplication {
+    constructor() {
+        this.commands = {};
+        this.base = new FsCommandBase();
+        process.env.currentDir = path.resolve(os.homedir());
+        process.env.rootDir = path.parse(process.env.currentDir).root;
+        this.userName = "";
+    }
 
-// Получаем все экспортированные функции
-// const allFunctions = Object.entries(funcModule);
+    setUserName() {
+        this.userName = process.env.npm_config_username || "guest";
+    }
 
-// // Запускаем каждую функцию
-// allFunctions.forEach(([funcName, func]) => {
-//     if (typeof func === "function") {
-//         console.log(`Запуск функции: ${funcName}`);
-//         console.log(func());
-//     }
-// });
+    registerCommand(commandList) {
+        this.commands = {};
+        commandList.forEach((commandClass) => {
+            this.commands[commandClass.name] = commandClass;
+        });
+    }
 
-// await calculateHash(path.resolve("./", "blabla.txt"));
+    startProcess() {
+        console.log(`Welcome to the File Manager, ${this.userName}!`);
+        process.stdin.on("data", async (data) => {
+            const processData = data.toString().replace(os.EOL, "").split(" ");
+            const [command, ...args] = processData;
 
-// compression.compress(path.resolve("./", "blabla.txt"), path.resolve("./"));
+            if (command === ".exit") {
+                process.exit();
+            }
 
-compression.decompress(path.resolve("./", "blabla.txt.gz"), path.resolve("./"));
+            if (!this.commands[command]) {
+                this.base.showError("input", `Unknown command ${command}`);
+            } else {
+                await this.commands[command].execute(args);
+            }
+
+            console.log(
+                colorText(
+                    `\nYou are currently in ${process.env.currentDir}`,
+                    "white",
+                    "bold"
+                )
+            );
+        });
+
+        process.stdin.on("error", (e) => {
+            console.log(e);
+        });
+
+        process.on("SIGINT", function () {
+            process.exit();
+        });
+
+        process.on("exit", () => {
+            console.log(
+                colorText(
+                    `Thank you for using File Manager, ${this.userName}, goodbye!`,
+                    "white"
+                )
+            );
+        });
+    }
+}
+
+const app = new CLIApplication();
+app.registerCommand([
+    new CopyCLICommand(),
+    new MkDirCLICommand(),
+    new AddCLICommand(),
+    new ReadCLICommand(),
+    new RemoveCLICommand(),
+    new RenameCliCommand(),
+    new MoveCLICommand(),
+    new OsCommandBase(),
+    new HashCLICommand(),
+    new CompressCLICommand(),
+    new DecompressCLICommand(),
+    new UpCLICommand(),
+    new ListCLICommand(),
+    new ChangeDirCLICommand(),
+]);
+app.setUserName();
+app.startProcess();
